@@ -1,19 +1,34 @@
+//Paquetes NPM
 const express = require("express");
-const app = express();
 const uuid = require('uuid');
+const app = express();
+
+
+//MODULOS DE RUTAS desde la carpeta routes
+const usersRoutes = require('./routes/usersApiRoutes')
+
+
+//simulacion de la BBDD. ./db/users.json
+const users = require("./db/users.json");
+
+
+// middlewares
+app.use(express.json()); // Habilitar tipo de dato a recibir
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'))
 
 
 const PORT = 3000;
 
-const users = require("./db/users.json");
 
 
+
+//RUTAS
 // 1- Crea el endpoint /users (GET) que devuelva todos los usuarios
 app.get('/api/users', function (req, res) {
-  res.json(users)
+  res.status(200).json(users)
 })
 // http://localhost:3000/api/users
-
 
 
 // 2- Crea el endpoint /users/:username (GET) que devuelva un único usuario en base al username (si hubiera varios, devuelve solo el primero)
@@ -24,7 +39,7 @@ app.get('/api/users/username/:username', function (req, res) {
   if (!user) {
   return res.status(404).json({ error: 'User not found' });
   }
-  res.json(user);
+  res.status(200).json(user);
   });
   
 //http://localhost:3000/api/users/username/Jianping_Shemesh  
@@ -34,7 +49,7 @@ app.get('/api/users/username/:username', function (req, res) {
 // 3- Crea el endpoint /users/total (GET) para devolver el total de usuarios
 
 app.get('/api/users/total', function (req, res) {
-  res.json(users.length)
+  res.status(200).json(users.length)
 })
 
 // http://localhost:3000/api/users/total
@@ -45,7 +60,7 @@ app.get('/api/users/country/:country', function (req, res) {
   const country = req.params.country;
   const usersByCountry = users.filter(u => u.address.country === country);
   if(!usersByCountry.length) return res.status(404).json({ error: 'Users not found' });
-  res.json(usersByCountry);
+  res.status(200).json(usersByCountry);
   });
 
 //http://localhost:3000/api/users/country/Somalia
@@ -61,7 +76,7 @@ app.get('/api/users/vehicles/min&max?', function (req, res) {
   const usersWithVehicles = users.filter(u => u.vehicles.length >= minVehicles && u.vehicles.length <= maxVehicles);
   if(!usersWithVehicles.length) return res.status(404).json({ error: 'Users not found' });
   const filteredUsers = usersWithVehicles.map(u => ({ email: u.email, username: u.username, img: u.img }));
-  res.json(filteredUsers);
+  res.status(200).json(filteredUsers);
   });
 
   // http://localhost:3000/api/users/vehicles?min=2&max=4
@@ -73,7 +88,7 @@ app.get('/api/users/food/:food', function (req, res) {
   const food = req.params.food;
   const usersByFood = users.filter(u => u.favouritesFood.includes(food));
   if(!usersByFood.length) return res.status(404).json({ error: 'Users not found' });
-  res.json(usersByFood);
+  res.status(200).json(usersByFood);
   });
 
   // http://localhost:3000/api/users/food/Ramen
@@ -84,7 +99,7 @@ app.get('/api/users/food/:food', function (req, res) {
 app.get('/api/foods', function (req, res) {
   const allFoods = users.map(u => u.favouritesFood).flat();
   const uniqueFoods = [...new Set(allFoods)];
-  res.json(uniqueFoods);
+  res.status(200).json(uniqueFoods);
   });
 
 // http://localhost:3000/api/foods
@@ -114,7 +129,7 @@ app.get('/api/users/vehicles/fuel&manufacturer&model?', function (req, res) {
   }
   if (!usersWithVehicles.length) return res.status(404).json({ error: 'Users not found' });
   const filteredUsers = usersWithVehicles.map(u => ({ email: u.email, username: u.username, img: u.img }));
-  res.json(filteredUsers);
+  res.status(200).json(filteredUsers);
   });
 
 // http://localhost:3000/api/users/vehicles?fuel=Diesel&manufacturer=Honda
@@ -130,7 +145,7 @@ app.get('/api/vehicles', function (req, res) {
   }
   const uniqueVehicles = [...new Set(allVehicles.map(v => v.car))];
   const vehicles = uniqueVehicles.map(v => ({car: v, count: allVehicles.filter(vehicle => vehicle.car === v).length}));
-  res.json(vehicles);
+  res.status(200).json(vehicles);
   });
 
   // http://localhost:3000/api/users/vehicles/fuel&manufacturer&model?fuel=Electric&manufacturer=Jeep
