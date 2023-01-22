@@ -2,6 +2,7 @@
 const express = require("express");
 const uuid = require('uuid');
 const users = require("./db/users.json");
+const path = require('path');
 
 
 
@@ -20,6 +21,9 @@ const PORT = 3000;
 //rutas
 app.use('/', usersApiRoutes);
 
+app.get('/', (req,res)=>{
+  res.sendFile(path.join(__dirname, 'readme.md'));
+});
 
 
 app.listen(PORT, () => {
